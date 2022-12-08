@@ -1,6 +1,7 @@
 ﻿using Moq;
 using MoqApi.Entities;
 using MoqApi.Repositories;
+using Newtonsoft.Json;
 
 namespace MoqTest;
 
@@ -18,15 +19,14 @@ public class UserServiceTest
     [Fact]
     public void GetUserTest()
     {
-        UsersRepositoryMock.Setup(u => u.GetUser(2)).Returns(new UserEntity(){Id = 1, Name = "user1"});
+        UsersRepositoryMock.Setup(u => u.GetUser(2)).Returns(new UserEntity(){Id = 2, Name = "user2"});
 
-        var user = new UserEntity()
-        {
-            Id = 1,
-            Name = "userName1"
-        };
+        var user2Test1 = new UserEntity() { Id = 2, Name = "user2" };
+        var user2Test2 = new UserEntity() { Id = 2, Name = "userName2" };
 
-        Assert.Equal(user, UsersRepository.GetUser(1)); // False
+        Assert.Null(UsersRepository.GetUser(1));
+        Assert.NotEqual(JsonConvert.SerializeObject(user2Test2) , JsonConvert.SerializeObject(UsersRepository.GetUser(2)));
+        Assert.Equal(JsonConvert.SerializeObject(user2Test1) , JsonConvert.SerializeObject(UsersRepository.GetUser(2)));
     }
 
     [Fact]
@@ -34,8 +34,13 @@ public class UserServiceTest
     {
         UsersRepositoryMock.Setup(u => u.GetName()).Returns("name");
 
-        Assert.NotNull(UsersRepository.GetName()); // True
-        Assert.Equal("name", UsersRepository.GetName()); // True
-        
+        Assert.NotNull(UsersRepository.GetName());
+        Assert.Equal("name", UsersRepository.GetName());
+    }
+
+    [Fact]
+    public void AddUserTest()
+    {
+        UsersRepository.AddUser(new UserEntity());
     }
 }
